@@ -1,0 +1,96 @@
+diff --git a/readline/histlib.h b/readline/histlib.h
+index c938a10..018097e 100644
+--- a/readline/histlib.h
++++ b/readline/histlib.h
+@@ -51,9 +51,6 @@
+ #endif
+ 
+ #ifndef member
+-#  ifndef strchr
+-extern char *strchr ();
+-#  endif
+ #define member(c, s) ((c) ? ((char *)strchr ((s), (c)) != (char *)NULL) : 0)
+ #endif
+ 
+diff --git a/readline/signals.c b/readline/signals.c
+index f119691..3fe1647 100644
+--- a/readline/signals.c
++++ b/readline/signals.c
+@@ -48,23 +48,11 @@
+ 
+ #if defined (HANDLE_SIGNALS)
+ 
+-#if !defined (RETSIGTYPE)
+-#  if defined (VOID_SIGHANDLER)
+-#    define RETSIGTYPE void
+-#  else
+-#    define RETSIGTYPE int
+-#  endif /* !VOID_SIGHANDLER */
+-#endif /* !RETSIGTYPE */
+-
+-#if defined (VOID_SIGHANDLER)
+-#  define SIGHANDLER_RETURN return
+-#else
+-#  define SIGHANDLER_RETURN return (0)
+-#endif
++#define SIGHANDLER_RETURN return
+ 
+ /* This typedef is equivalent to the one for Function; it allows us
+    to say SigHandler *foo = signal (SIGKILL, SIG_IGN); */
+-typedef RETSIGTYPE SigHandler ();
++typedef void SigHandler (int);
+ 
+ #if defined (HAVE_POSIX_SIGNALS)
+ typedef struct sigaction sighandler_cxt;
+@@ -78,11 +66,11 @@ typedef struct { SigHandler *sa_handler; int sa_mask, sa_flags; } sighandler_cxt
+ #  define SA_RESTART 0
+ #endif
+ 
+-static SigHandler *rl_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
+-static void rl_maybe_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
++static SigHandler *rl_set_sighandler (int, SigHandler *, sighandler_cxt *);
++static void rl_maybe_set_sighandler (int, SigHandler *, sighandler_cxt *);
+ 
+-static RETSIGTYPE rl_signal_handler PARAMS((int));
+-static RETSIGTYPE _rl_handle_signal PARAMS((int));
++static void rl_signal_handler (int);
++static void _rl_handle_signal (int);
+      
+ /* Exported variables for use by applications. */
+ 
+@@ -129,7 +117,7 @@ static sighandler_cxt old_winch;
+ /* Readline signal handler functions. */
+ 
+ /* Called from RL_CHECK_SIGNALS() macro */
+-RETSIGTYPE
++void
+ _rl_signal_handler (sig)
+      int sig;
+ {
+@@ -139,7 +127,7 @@ _rl_signal_handler (sig)
+   SIGHANDLER_RETURN;
+ }
+ 
+-static RETSIGTYPE
++static void
+ rl_signal_handler (sig)
+      int sig;
+ {
+@@ -154,7 +142,7 @@ rl_signal_handler (sig)
+   SIGHANDLER_RETURN;
+ }
+ 
+-static RETSIGTYPE
++static void
+ _rl_handle_signal (sig)
+      int sig;
+ {
+@@ -240,7 +228,7 @@ _rl_handle_signal (sig)
+ }
+ 
+ #if defined (SIGWINCH)
+-static RETSIGTYPE
++static void
+ rl_sigwinch_handler (sig)
+      int sig;
+ {
