@@ -1,0 +1,18 @@
+diff --git a/gdb/common/default-init-alloc.h b/gdb/common/default-init-alloc.h
+index 2d739c9..e102b36 100644
+--- a/gdb/common/default-init-alloc.h
++++ b/gdb/common/default-init-alloc.h
+@@ -48,8 +48,12 @@ public:
+     typedef default_init_allocator<U, alloc_> other;
+   };
+
+-  /* Make the base allocator's construct method(s) visible.  */
++  /* Make the base allocator's construct method(s) visible.  std::allocator
++     no longer provides construct()/destroy() as of C++20, so only pull
++     these in when they are actually available.  */
++#if __cplusplus < 202002L
+   using A::construct;
++#endif
+
+   /* .. and provide an override/overload for the case of default
+      construction (i.e., no arguments).  This is where we construct
