@@ -8,7 +8,6 @@ config GDB_NATIVE
     select LIBC_UCLIBC_WCHAR if LIBC_UCLIBC_NG
     select LIBC_UCLIBC_IPV6 if LIBC_UCLIBC_NG && GDB_8_3_or_later
     select LIBC_UCLIBC_LIBICONV if LIBC_UCLIBC_NG && GDB_15_or_later
-    select EXPAT_TARGET
     select NCURSES_TARGET
     select GMP_TARGET if GDB_11_or_later
     select MPFR_TARGET if GDB_13_or_later
@@ -76,6 +75,24 @@ config GDB_NATIVE_STATIC_LIBSTDCXX
     help
       Say 'y' if you do not want gdbserver to require libstdc++.so on the
       target.
+
+config GDB_NATIVE_EXPAT
+    bool
+    prompt "Expat (XML) support"
+    depends on GDB_NATIVE
+    default y
+    select EXPAT_TARGET
+    help
+      Build libexpat for the target and link native gdb against it.
+      This enables GDB features that rely on parsing XML over the
+      remote protocol: target descriptions (register sets), shared
+      library lists, syscall name tables, OS info queries and
+      trace-frame info.
+
+      Say 'n' if you do not need these features. This avoids building
+      a target libexpat and installing its headers and static library
+      into the toolchain sysroot, where they can conflict with a
+      different expat version shipped by your SDK/rootfs.
 
 config GDB_NATIVE_EXTRA_CONFIG_ARRAY
     string "Extra configure arguments for native gdb"

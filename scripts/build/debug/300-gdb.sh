@@ -167,21 +167,25 @@ do_debug_gdb_build()
             --localstatedir=/var
         )
 
-        # Target libexpat resides in sysroot and does not have
-        # any dependencies, so just passing '-lexpat' to gcc is enough.
-        #
-        # By default gdb configure looks for expat in '$prefix/lib'
-        # directory. In our case '$prefix/lib' resolves to '/usr/lib'
-        # where libexpat for build platform lives, which is
-        # unacceptable for cross-compiling.
-        #
-        native_extra_config+=("--with-expat=y")
-        native_extra_config+=("--with-libexpat-prefix=${CT_BUILDTOOLS_PREFIX_DIR}")
+        if [ "${CT_GDB_NATIVE_EXPAT}" = "y" ]; then
+            # Target libexpat resides in sysroot and does not have
+            # any dependencies, so just passing '-lexpat' to gcc is enough.
+            #
+            # By default gdb configure looks for expat in '$prefix/lib'
+            # directory. In our case '$prefix/lib' resolves to '/usr/lib'
+            # where libexpat for build platform lives, which is
+            # unacceptable for cross-compiling.
+            #
+            native_extra_config+=("--with-expat=y")
+            native_extra_config+=("--with-libexpat-prefix=${CT_BUILDTOOLS_PREFIX_DIR}")
 
-        # Without specifying libexpat type, configure would look for -lexpat
-        # and try to link with shared library, set library type explicitly.
-        if [ "${CT_GDB_NATIVE_STATIC}" = "y" ]; then
-            native_extra_config+=("--with-libexpat-type=static")
+            # Without specifying libexpat type, configure would look for -lexpat
+            # and try to link with shared library, set library type explicitly.
+            if [ "${CT_GDB_NATIVE_STATIC}" = "y" ]; then
+                native_extra_config+=("--with-libexpat-type=static")
+            fi
+        else
+            native_extra_config+=("--with-expat=no")
         fi
         do_gdb_backend \
             buildtype=native \
